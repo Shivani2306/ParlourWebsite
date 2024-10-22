@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beauty Parlour</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Our Beauty Parlour</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="appointment.html">Appointment</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>About Us</h2>
+        <p>Welcome to our beauty parlour! We offer a range of beauty services to pamper you.</p>
+        
+        <!-- Appointment Booking Section -->
+        <h2><a href="appointment.html">Book an Appointment</a></h2> 
+
+
+        <ul id="appointmentList"></ul>
+        
+    </main>
+    <footer>
+        <p>© Pratiksha Beauty Parlour</p>
+    </footer>
+
+    <script>
+        document.getElementById('appointmentForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+
+            const appointment = { name, date, time };
+            let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+            appointments.push(appointment);
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+
+            displayAppointments();
+            this.reset();
+        });
+
+        function displayAppointments() {
+            const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+            const appointmentList = document.getElementById('appointmentList');
+            appointmentList.innerHTML = '';
+            appointments.forEach(app => {
+                const li = document.createElement('li');
+                li.textContent = `${app.name} - ${app.date} at ${app.time}`;
+                appointmentList.appendChild(li);
+            });
+        }
+
+        displayAppointments();
+    </script>
+</body>
+</html>
+

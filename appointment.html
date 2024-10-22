@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .edit-input {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Book an Appointment</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="appointment.html">Appointment</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Appointment Form</h2>
+        <form id="appointment-form">
+            <label for="name">Name:</label>
+            <input type="text" id="name" required>
+
+            <label for="service-type"> ServiceType:</label>
+            <select id="service-type" required>
+                <option value="" disabled selected>Select Service</option>
+                <option value="Haircut">Haircut</option>
+                <option value="Facial">Facial</option>
+                <option value="Manicure">Manicure</option>
+                <option value="Pedicure">Pedicure</option>
+                <option value="Massage">Massage</option>
+            </select>
+
+            <label for="date">Date:</label>
+            <input type="date" id="date" required>
+
+            <label for="time">Time:</label>
+            <input type="time" id="time" required>
+
+            <input type="submit" value="Book Appointment">
+        </form>
+
+        <h2>Booked Appointments</h2>
+        <ul id="appointmentList"></ul>
+    </main>
+    <footer>
+        <p>© 2024 Beauty Parlour</p>
+    </footer>
+    <script>
+        document.getElementById('appointment-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+            const name = document.getElementById('name').value;
+            const serviceType = document.getElementById('service-type').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+
+            const appointment = { name, serviceType, date, time };
+            let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+            appointments.push(appointment);
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+
+            displayAppointments();
+            this.reset(); // Reset the form fields
+        });
+
+        function displayAppointments() {
+            const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+            const appointmentList = document.getElementById('appointmentList');
+            appointmentList.innerHTML = ''; // Clear the existing list
+
+            appointments.forEach((app, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `${app.name} (${app.serviceType}) - ${app.date} at ${app.time} `;
+
+                // Create Edit button
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.onclick = () => editAppointment(index);
+
+                // Create Cancel button
+                const cancelButton = document.createElement('button');
+                cancelButton.textContent = 'Cancel';
+                cancelButton.onclick = () => cancelAppointment(index);
+
+                li.appendChild(editButton);
+                li.appendChild(cancelButton);
+                appointmentList.appendChild(li);
+            });
+        }
+
+        function editAppointment(index) {
+            const appointments = JSON.parse(localStorage.getItem('appointments'));
+            const app = appointments[index];
+
+            // Create an edit form for the appointment
+            const editForm = document.createElement('div');
+            editForm.innerHTML = `
+                <label>Name:</label>
+                <input type="text" id="edit-name" class="edit-input" value="${app.name}">
+                <label>Service Type:</label>
+                <select id="edit-service-type" class="edit-input">
+                    <option value="Haircut" ${app.serviceType === 'Haircut' ? 'selected' : ''}>Haircut</option>
+                    <option value="Facial" ${app.serviceType === 'Facial' ? 'selected' : ''}>Facial</option>
+                    <option value="Manicure" ${app.serviceType === 'Manicure' ? 'selected' : ''}>Manicure</option>
+                    <option value="Pedicure" ${app.serviceType === 'Pedicure' ? 'selected' : ''}>Pedicure</option>
+                    <option value="Massage" ${app.serviceType === 'Massage' ? 'selected' : ''}>Massage</option>
+                </select>
+                <label>Date:</label>
+                <input type="date" id="edit-date" class="edit-input" value="${app.date}">
+                <label>Time:</label>
+                <input type="time" id="edit-time" class="edit-input" value="${app.time}">
+                <button onclick="saveAppointment(${index})">Save</button>
+                <button onclick="cancelEdit()">Cancel</button>
+            `;
+
+            const appointmentList = document.getElementById('appointmentList');
+            appointmentList.innerHTML = ''; // Clear the appointment list to show edit form
+            appointmentList.appendChild(editForm); // Show the edit form
+        }
+
+        function saveAppointment(index) {
+            const appointments = JSON.parse(localStorage.getItem('appointments'));
+
+            const newName = document.getElementById('edit-name').value;
+            const newServiceType = document.getElementById('edit-service-type').value;
+            const newDate = document.getElementById('edit-date').value;
+            const newTime = document.getElementById('edit-time').value;
+
+            appointments[index] = { name: newName, serviceType: newServiceType, date: newDate, time: newTime };
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+            displayAppointments(); // Refresh the appointment list
+        }
+
+        function cancelAppointment(index) {
+            const appointments = JSON.parse(localStorage.getItem('appointments'));
+            appointments.splice(index, 1); // Remove appointment from the list
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+            displayAppointments();
+        }
+
+        function cancelEdit() {
+            displayAppointments(); // Show the appointment list again
+        }
+
+        // Display appointments on page load
+        displayAppointments();
+    </script>
+</body>
+</html>
+
