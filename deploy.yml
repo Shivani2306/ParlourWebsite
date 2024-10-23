@@ -1,0 +1,31 @@
+name: Deploy HTML to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Trigger deployment on pushes to the main branch. Adjust based on your branch name.
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'  # Even if you're not using Node.js, GitHub Actions often uses this as a base environment.
+
+      - name: Install dependencies
+        run: npm install  # This is useful if you have any build tools or dependencies; otherwise, you can skip this step.
+
+      - name: Build the site
+        run: npm run build  # Replace with your build command, or remove if you don't need to build the HTML.
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # This is automatically provided by GitHub Actions.
+          publish_dir: ./  # Set to the directory where your HTML files are located. Use './' if they are in the root.
